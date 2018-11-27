@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'GroupShadowedTableView_Example' do
+  pod 'GroupShadowedTableView', :path => '../'
+
+  target 'GroupShadowedTableView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
