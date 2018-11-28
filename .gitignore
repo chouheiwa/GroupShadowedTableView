@@ -1,2 +1,3 @@
 Example/Podfile.lock
-Emample/Pods
+Example/Pods
+*.xcworkspace
