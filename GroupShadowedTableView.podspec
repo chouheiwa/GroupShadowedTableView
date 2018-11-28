@@ -8,9 +8,11 @@
 
 Pod::Spec.new do |s|
   s.name             = 'GroupShadowedTableView'
-  s.version          = '0.1.0'
+  s.version          = '0.1.01'
   s.summary          = 'A GroupShadowedTableView for iOS.'
-
+  
+  swift_version = 4.2
+  
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
 #   * Try to keep it short, snappy and to the point.
@@ -27,7 +29,9 @@ TODO: Add long description of the pod here.
   s.author           = { 'chouheiwa' => '849131492@qq.com' }
   s.source           = { :git => 'https://github.com/chouheiwa/GroupShadowedTableView.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
-
+  s.swift_version = '4.2'
+  s.framework  = "UIKit"
+  
   s.ios.deployment_target = '9.0'
 
   s.source_files = 'GroupShadowedTableView/Classes/**/*.swift'
@@ -40,3 +44,6 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
+
+
+

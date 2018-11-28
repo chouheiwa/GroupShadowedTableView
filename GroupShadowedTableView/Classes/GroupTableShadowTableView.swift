@@ -30,8 +30,8 @@ import UIKit
 
 
 public class GroupShadowedTableView: UITableView {
-    weak var groupDelegate: GroupShadowedTableViewDelegate?
-    weak var groupDataSource: GroupShadowedTableViewDataSource?
+    weak public var groupDelegate: GroupShadowedTableViewDelegate?
+    weak public var groupDataSource: GroupShadowedTableViewDataSource?
     
     var showSeparator: Bool = true
     
