@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'GroupShadowedTableView'
-  s.version          = '0.1.01'
+  s.version          = '0.2'
   s.summary          = 'A GroupShadowedTableView for iOS.'
   
   swift_version = 4.2
