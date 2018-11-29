@@ -87,6 +87,7 @@ extension GroupedTableViewCell:UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         guard let cell = cellForRow?(self,IndexPath(row: indexPath.row, section: currentSection)) else { return UITableViewCell() }
         
         return cell
@@ -153,8 +154,6 @@ extension GroupedTableViewCell:UITableViewDelegate, UITableViewDataSource {
             needSeparator = true
             break
         }
-        
-        print("\(indexPath) type:\(type)")
         
         layer.path = pathRef
         

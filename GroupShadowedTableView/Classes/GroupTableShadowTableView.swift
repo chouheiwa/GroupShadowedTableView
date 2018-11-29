@@ -23,7 +23,15 @@ import UIKit
 @objc public protocol GroupShadowedTableViewDataSource {
     @objc optional func numberOfSections(in tableView: GroupShadowedTableView) -> Int
     
-    func groupTableView(_ groupTableView: GroupShadowedTableView,cellForRowAt indexPath: IndexPath) -> UITableViewCell
+    /// 获取TableViewCell
+    ///
+    /// - Parameters:
+    ///   - groupTableView: 自身tableView
+    ///   - indexPath: 当前需要显示的indexPath
+    ///   - currentTableView: 真实需要获取cell的tableView
+    ///   - realIndexPath: 真实的indexPath
+    /// - Returns: UITableViewCell
+    func groupTableView(_ groupTableView: GroupShadowedTableView,cellForRowAt indexPath: IndexPath,currentTableView: UITableView,realIndexPath: IndexPath) -> UITableViewCell
     
     func groupTableView(_ groupTableView: GroupShadowedTableView,numberOfRowsIn section: Int) -> Int
 }
@@ -33,12 +41,16 @@ public class GroupShadowedTableView: UITableView {
     weak public var groupDelegate: GroupShadowedTableViewDelegate?
     weak public var groupDataSource: GroupShadowedTableViewDataSource?
     
+    private struct Keys {
+        static let cellReuseIdentifier = "com.chouheiwa.GroupTableViewCell"
+    }
+    
     var showSeparator: Bool = true
     
     private var selectedCell: GroupedTableViewCell?
     
-    private var classDic: [String:AnyClass] = [:]
-    private var nibDic: [String:UINib] = [:]
+    private var classForRowDic: [String:AnyClass] = [:]
+    private var nibForRowDic: [String:UINib] = [:]
     
     override init(frame: CGRect, style: UITableView.Style) {
         super.init(frame: frame, style: style)
@@ -61,7 +73,7 @@ public class GroupShadowedTableView: UITableView {
         
         separatorStyle = .none
         
-        self.register(GroupedTableViewCell.classForCoder(), forCellReuseIdentifier: "GroupTableViewCell")
+        self.register(GroupedTableViewCell.classForCoder(), forCellReuseIdentifier: Keys.cellReuseIdentifier)
         self.delegate = self
         self.dataSource = self
         
@@ -70,6 +82,23 @@ public class GroupShadowedTableView: UITableView {
     override public func deselectRow(at indexPath: IndexPath, animated: Bool) {
         guard let selectedCell = selectedCell else { return }
         selectedCell.baseTableView.deselectRow(at: IndexPath(row: indexPath.row, section: 0), animated: animated)
+    }
+    
+    public override func register(_ nib: UINib?, forCellReuseIdentifier identifier: String) {
+        guard identifier != Keys.cellReuseIdentifier else { fatalError("Can not use a identifier : \(identifier)") }
+        
+        nibForRowDic[identifier] = nib
+    }
+    
+    public override func register(_ cellClass: AnyClass?, forCellReuseIdentifier identifier: String) {
+        if identifier == Keys.cellReuseIdentifier {
+            guard let cellClass = cellClass as? GroupedTableViewCell.Type else { fatalError("Can not use a identifier : \(identifier) to regiser another class") }
+            
+            super.register(cellClass, forCellReuseIdentifier: identifier)
+            return
+        }
+        
+        classForRowDic[identifier] = cellClass
     }
 }
 
@@ -90,24 +119,24 @@ extension GroupShadowedTableView: UITableViewDelegate,UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "GroupTableViewCell") as? GroupedTableViewCell else { return UITableViewCell() }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Keys.cellReuseIdentifier) as? GroupedTableViewCell else { return UITableViewCell() }
         
         cell.currentSection = indexPath.section
         
         cell.showSeparator = showSeparator
         
-        for (key,value) in classDic {
+        for (key,value) in classForRowDic {
             cell.baseTableView.register(value, forCellReuseIdentifier: key)
         }
         
-        for (key,value) in nibDic {
+        for (key,value) in nibForRowDic {
             cell.baseTableView.register(value, forCellReuseIdentifier: key)
         }
         
         cell.cellForRow = { [weak self] (basicCell,indexPath) in
             guard let `self` = self else {return UITableViewCell()}
             
-            guard let cell = self.groupDataSource?.groupTableView(self, cellForRowAt: indexPath) else {return UITableViewCell()}
+            guard let cell = self.groupDataSource?.groupTableView(self, cellForRowAt: indexPath,currentTableView: basicCell.baseTableView,realIndexPath: IndexPath(row: indexPath.row, section: 0)) else {return UITableViewCell()}
             
             return cell
         }
